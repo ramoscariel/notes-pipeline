@@ -25,6 +25,11 @@ spec:
         env:
         - name: PORT
           value: "8000"
+        - name: LAUNCHDARKLY_SDK_KEY
+          valueFrom:
+            secretKeyRef:
+              name: launchdarkly-secret
+              key: sdk-key
         livenessProbe:
           httpGet:
             path: /docs
