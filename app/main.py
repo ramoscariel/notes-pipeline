@@ -6,6 +6,7 @@ from app.launchdarkly_config import ld_client
 
 app = FastAPI(title="Notes API")
 
+
 @app.on_event("startup")
 async def startup_event():
     ld_client.initialize()
@@ -16,10 +17,14 @@ def create(note: NoteCreate, request: Request):
     user_id = request.headers.get("X-User-Id", request.client.host)
     context = ld_client.create_context(user_id)
 
-    enable_note_creation = ld_client.get_flag("enable-note-creation", context, True)
+    enable_note_creation = ld_client.get_flag(
+        "enable-note-creation", context, True
+    )
 
     if not enable_note_creation:
-        raise HTTPException(status_code=503, detail="Note creation is temporarily disabled")
+        raise HTTPException(
+            status_code=503, detail="Note creation is temporarily disabled"
+        )
 
     return create_note(note)
 
@@ -29,7 +34,9 @@ def list_notes(request: Request):
     user_id = request.headers.get("X-User-Id", request.client.host)
     context = ld_client.create_context(user_id)
 
-    enable_advanced_filtering = ld_client.get_flag("enable-advanced-filtering", context, False)
+    enable_advanced_filtering = ld_client.get_flag(
+        "enable-advanced-filtering", context, False
+    )
 
     notes = get_notes()
 
@@ -52,15 +59,20 @@ def delete(note_id: int, request: Request):
     user_id = request.headers.get("X-User-Id", request.client.host)
     context = ld_client.create_context(user_id)
 
-    enable_note_deletion = ld_client.get_flag("enable-note-deletion", context, True)
+    enable_note_deletion = ld_client.get_flag(
+        "enable-note-deletion", context, True
+    )
 
     if not enable_note_deletion:
-        raise HTTPException(status_code=503, detail="Note deletion is temporarily disabled")
+        raise HTTPException(
+            status_code=503, detail="Note deletion is temporarily disabled"
+        )
 
     deleted = delete_note(note_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Note not found")
     return {"deleted": True}
+
 
 @app.on_event("shutdown")
 async def shutdown_event():

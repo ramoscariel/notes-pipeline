@@ -30,7 +30,12 @@ class LaunchDarklyClient:
             self.initialize()
         return self._client
 
-    def create_context(self, user_id: str, email: Optional[str] = None, custom_attributes: Optional[dict] = None):
+    def create_context(
+        self,
+        user_id: str,
+        email: Optional[str] = None,
+        custom_attributes: Optional[dict] = None
+    ):
         builder = Context.builder(user_id).kind('user')
 
         if email:
@@ -42,7 +47,12 @@ class LaunchDarklyClient:
 
         return builder.build()
 
-    def get_flag(self, flag_key: str, context: Context, default_value: bool = False) -> bool:
+    def get_flag(
+        self,
+        flag_key: str,
+        context: Context,
+        default_value: bool = False
+    ) -> bool:
         client = self.get_client()
         return client.variation(flag_key, context, default_value)
 
