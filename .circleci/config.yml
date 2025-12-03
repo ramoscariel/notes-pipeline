@@ -1,0 +1,87 @@
+version: 2.1
+
+executors:
+  python-executor:
+    docker:
+      - image: cimg/python:3.13
+
+jobs:
+  build:
+    executor: python-executor
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip install -r requirements.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - venv
+            - app
+            - tests
+
+  lint:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: List files
+          command: ls -R
+      - run:
+          name: Lint code
+          command: |
+            . venv/bin/activate
+            pip install flake8
+            flake8 app tests
+
+  test:
+    executor: python-executor
+    parallelism: 2
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run tests in parallel
+          command: |
+            . venv/bin/activate
+            pip install pytest pytest-cov pytest-xdist
+            mkdir -p test-results
+            export PYTHONPATH=$(pwd)
+            pytest -n auto --junitxml=test-results/results.xml --cov=app > test-results/summary.txt
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+      - persist_to_workspace:
+          root: .
+          paths:
+            - test-results
+
+  deploy:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Simulate deployment
+          command: |
+            echo "Deploying FastAPI Notes app..."
+
+workflows:
+  ci_pipeline:
+    jobs:
+      - build
+      - lint:
+          requires:
+            - build
+      - test:
+          requires:
+            - lint
+      - deploy:
+          requires:
+            - test
