@@ -6,7 +6,7 @@ metadata:
   labels:
     app: notes-api
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: notes-api
@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
       - name: notes-api
-        image: notes-api:latest
-        imagePullPolicy: IfNotPresent
+        image: akar3f/notes-app:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
           name: http
