@@ -3,6 +3,11 @@ kind: Application
 metadata:
   name: notes-api
   namespace: argocd
+  annotations:
+    # tells image updater which image to track
+    argocd-image-updater.argoproj.io/image-list: notes-app=akar3f/notes-app
+    # always upgrade to latest
+    argocd-image-updater.argoproj.io/notes-app.update-strategy: latest
 spec:
   project: default
 
