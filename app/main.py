@@ -3,7 +3,7 @@ from app.crud import create_note, get_note_by_id, get_notes, delete_note
 from app.models import Note, NoteCreate
 from app.launchdarkly_config import ld_client
 
-
+# Hola mundo!
 app = FastAPI(title="Notes API")
 
 
